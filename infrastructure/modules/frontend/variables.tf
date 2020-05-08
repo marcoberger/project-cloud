@@ -21,3 +21,4 @@ variable "project" {
 variable "eb_lb_dns_name" {
   description = "The DNS Name of the ElasticBeanstalk Load Balancer"
 }
+

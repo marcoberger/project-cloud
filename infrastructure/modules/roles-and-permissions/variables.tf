@@ -29,3 +29,4 @@ variable "s3_bucket_frontend_id" {
 variable "origin_access_identity_iam_arn" {
   description = "The IAM ARN of the CloudFront Origin access identity"
 }
+

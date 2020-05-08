@@ -1,8 +1,8 @@
 locals {
   tags = {
-    Environment = "${var.environment}"
-    Team        = "${var.team}"
-    Project     = "${var.project}"
+    Environment = var.environment
+    Team        = var.team
+    Project     = var.project
   }
 
   ressource_prefix = "${var.environment}-${var.team}-${var.project}"
@@ -17,10 +17,10 @@ locals {
 # ========================================================================
 
 resource "aws_s3_bucket_object" "s3_bucket_applicationversion_object" {
-  bucket = "${aws_s3_bucket.s3_bucket_applicationversion.id}"
+  bucket = aws_s3_bucket.s3_bucket_applicationversion.id
   key    = "beanstalk/${local.jar_file_name}"
-  source = "${local.jar_file_path}"
-  etag   = "${filemd5(local.jar_file_path)}"
+  source = local.jar_file_path
+  etag   = filemd5(local.jar_file_path)
 }
 
 resource "aws_elastic_beanstalk_application" "eb_app" {
@@ -30,16 +30,16 @@ resource "aws_elastic_beanstalk_application" "eb_app" {
 
 resource "aws_elastic_beanstalk_environment" "eb_environment" {
   name         = "${local.ressource_prefix}-backend-env"
-  application  = "${aws_elastic_beanstalk_application.eb_app.name}"
+  application  = aws_elastic_beanstalk_application.eb_app.name
   tier         = "WebServer"
   platform_arn = "arn:aws:elasticbeanstalk:${var.region}::platform/Java 8 running on 64bit Amazon Linux/2.8.2"
 
-  version_label = "${aws_elastic_beanstalk_application_version.eb_app_version.name}"
+  version_label = aws_elastic_beanstalk_application_version.eb_app_version.name
 
   setting {
     name      = "IamInstanceProfile"
     namespace = "aws:autoscaling:launchconfiguration"
-    value     = "${data.aws_iam_instance_profile.eb_instanceprofile.name}"
+    value     = data.aws_iam_instance_profile.eb_instanceprofile.name
   }
 
   setting {
@@ -105,7 +105,7 @@ resource "aws_elastic_beanstalk_environment" "eb_environment" {
   setting {
     name      = "HealthCheckPath"
     namespace = "aws:elasticbeanstalk:environment:process:default"
-    value     = "${local.greeting_controller_path}"
+    value     = local.greeting_controller_path
   }
 
   setting {
@@ -123,13 +123,13 @@ resource "aws_elastic_beanstalk_environment" "eb_environment" {
   setting {
     name      = "Port"
     namespace = "aws:elasticbeanstalk:environment:process:default"
-    value     = "${var.backend_application_port}"
+    value     = var.backend_application_port
   }
 
   setting {
     name      = "HealthCheckPath"
     namespace = "aws:elasticbeanstalk:environment:process:actuator"
-    value     = "${local.health_check_path}"
+    value     = local.health_check_path
   }
 
   setting {
@@ -147,10 +147,10 @@ resource "aws_elastic_beanstalk_environment" "eb_environment" {
   setting {
     name      = "Port"
     namespace = "aws:elasticbeanstalk:environment:process:actuator"
-    value     = "${var.backend_management_port}"
+    value     = var.backend_management_port
   }
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 # Deployment of Backend jar file
@@ -165,13 +165,14 @@ resource "random_string" "app_version_suffix" {
 resource "aws_s3_bucket" "s3_bucket_applicationversion" {
   bucket = "${local.ressource_prefix}-eb-applicationversion"
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 resource "aws_elastic_beanstalk_application_version" "eb_app_version" {
   name        = "${local.ressource_prefix}-application-${random_string.app_version_suffix.result}"
-  application = "${aws_elastic_beanstalk_application.eb_app.name}"
+  application = aws_elastic_beanstalk_application.eb_app.name
   description = "${var.project} application version created by terraform"
-  bucket      = "${aws_s3_bucket.s3_bucket_applicationversion.id}"
-  key         = "${aws_s3_bucket_object.s3_bucket_applicationversion_object.id}"
+  bucket      = aws_s3_bucket.s3_bucket_applicationversion.id
+  key         = aws_s3_bucket_object.s3_bucket_applicationversion_object.id
 }
+

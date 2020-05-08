@@ -2,14 +2,14 @@
 # ========================================
 locals {
   tags = {
-    Environment = "${var.environment}"
-    Team        = "${var.team}"
-    Project     = "${var.project}"
+    Environment = var.environment
+    Team        = var.team
+    Project     = var.project
   }
 }
 
 provider "aws" {
-  region                  = "${var.region}"
+  region                  = var.region
   shared_credentials_file = "~/.aws/credentials"
   profile                 = "project-cloud"
 }
@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "tf_state" {
     enabled = true
   }
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 resource "aws_dynamodb_table" "tf_state_lock" {
@@ -38,5 +38,6 @@ resource "aws_dynamodb_table" "tf_state_lock" {
     type = "S"
   }
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
+

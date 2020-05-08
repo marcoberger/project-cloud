@@ -20,10 +20,11 @@ variable "project" {
 
 variable "backend_application_port" {
   description = "The port that is configured for the backend application"
-  default = "9000"
+  default     = "9000"
 }
 
 variable "backend_management_port" {
   description = "The port that is configured for the management module of the application"
-  default = "9001"
+  default     = "9001"
 }
+

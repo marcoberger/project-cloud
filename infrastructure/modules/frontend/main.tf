@@ -1,8 +1,8 @@
 locals {
   tags = {
-    Environment = "${var.environment}"
-    Team        = "${var.team}"
-    Project     = "${var.project}"
+    Environment = var.environment
+    Team        = var.team
+    Project     = var.project
   }
 
   ressource_prefix = "${var.environment}-${var.team}-${var.project}"
@@ -30,13 +30,11 @@ resource "random_string" "bucket_suffix" {
 resource "aws_s3_bucket" "s3_bucket_frontend" {
   bucket = "${local.ressource_prefix}-frontend-${random_string.bucket_suffix.result}"
 
-  website = [
-    {
-      index_document = "${local.default_index_document}"
-    },
-  ]
+  website {
+    index_document = local.default_index_document
+  }
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
@@ -45,17 +43,17 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
 
 resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   origin {
-    domain_name = "${aws_s3_bucket.s3_bucket_frontend.bucket_domain_name}"
-    origin_id   = "${local.cloudfront_frontend_origin_id}"
+    domain_name = aws_s3_bucket.s3_bucket_frontend.bucket_domain_name
+    origin_id   = local.cloudfront_frontend_origin_id
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path}"
+      origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
     }
   }
 
   origin {
-    domain_name = "${var.eb_lb_dns_name}"
-    origin_id   = "${local.cloudfront_backend_origin_id}"
+    domain_name = var.eb_lb_dns_name
+    origin_id   = local.cloudfront_backend_origin_id
 
     custom_origin_config {
       http_port              = "80"
@@ -69,7 +67,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   is_ipv6_enabled = true
 
   comment             = "The ${var.project} frontend"
-  default_root_object = "${local.default_index_document}"
+  default_root_object = local.default_index_document
 
   default_cache_behavior {
     allowed_methods = [
@@ -82,7 +80,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
       "HEAD",
     ]
 
-    target_origin_id = "${local.cloudfront_frontend_origin_id}"
+    target_origin_id = local.cloudfront_frontend_origin_id
 
     forwarded_values {
       query_string = true
@@ -95,8 +93,8 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
     min_ttl                = 0
-    default_ttl            = "${var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl}"
-    max_ttl                = "${var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl}"
+    default_ttl            = var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl
+    max_ttl                = var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl
   }
 
   price_class = "PriceClass_100"
@@ -111,7 +109,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     path_pattern     = "static/*"
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${local.cloudfront_frontend_origin_id}"
+    target_origin_id = local.cloudfront_frontend_origin_id
 
     forwarded_values {
       query_string = true
@@ -123,8 +121,8 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     }
 
     min_ttl                = 0
-    default_ttl            = "${var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl}"
-    max_ttl                = "${var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl}"
+    default_ttl            = var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl
+    max_ttl                = var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
   }
@@ -133,7 +131,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     path_pattern     = "greeting"
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${local.cloudfront_backend_origin_id}"
+    target_origin_id = local.cloudfront_backend_origin_id
 
     forwarded_values {
       query_string = true
@@ -145,8 +143,8 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     }
 
     min_ttl                = 0
-    default_ttl            = "${var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl}"
-    max_ttl                = "${var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl}"
+    default_ttl            = var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl
+    max_ttl                = var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
   }
@@ -155,7 +153,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     path_pattern     = "starwars-character"
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${local.cloudfront_backend_origin_id}"
+    target_origin_id = local.cloudfront_backend_origin_id
 
     forwarded_values {
       query_string = true
@@ -167,8 +165,8 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     }
 
     min_ttl                = 0
-    default_ttl            = "${var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl}"
-    max_ttl                = "${var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl}"
+    default_ttl            = var.environment == "dev" ? local.dev_default_ttl : local.prod_default_ttl
+    max_ttl                = var.environment == "dev" ? local.dev_max_ttl : local.prod_max_ttl
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
   }
@@ -191,7 +189,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     response_page_path    = "/${local.default_index_document}"
   }
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 # Deployment of static resources for frontend
@@ -202,7 +200,8 @@ resource "null_resource" "remove_and_upload_to_s3" {
     command = "aws s3 sync ${local.frontend_build_folder_path} s3://${aws_s3_bucket.s3_bucket_frontend.id}"
   }
 
-  triggers {
-    deployment_timestamp = "${timestamp()}"
+  triggers = {
+    deployment_timestamp = timestamp()
   }
 }
+
