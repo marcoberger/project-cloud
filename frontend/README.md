@@ -2,6 +2,9 @@
 
 The project-cloud frontend is a React Single Page-Application that was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It renders a single page with a button. When clicking the button, a simple request is send to the backend, which returns a sample Star Wars character. The frontend renders the name of the character.
 
+## Prerequisites
+- watchman (brew install watchman)
+
 
 ## Build the application
 To install dependencies and build the application execute the following commands from within the project root:
