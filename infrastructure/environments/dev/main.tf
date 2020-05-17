@@ -36,9 +36,8 @@ module "frontend" {
 }
 
 module "roles-and-permissions" {
-  source                         = "../../modules/roles-and-permissions"
+  source                         = "git::https://github.com/marcoberger/project-cloud-roles-permissions.git"
   s3_bucket_frontend_id          = module.frontend.s3_bucket_frontend_id
-  s3_bucket_frontend_arn         = module.frontend.s3_bucket_frontend_arn
   origin_access_identity_iam_arn = module.frontend.origin_access_identity_iam_arn
   environment                    = local.enviroment_identifier
 }
