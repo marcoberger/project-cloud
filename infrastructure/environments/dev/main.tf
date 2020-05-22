@@ -1,7 +1,6 @@
 # Terraform configuration
 # ========================================
 terraform {
-  required_version = ">=0.11.13"
 
   backend "s3" {
     bucket         = "dev-jedis-project-cloud-tf-state"
