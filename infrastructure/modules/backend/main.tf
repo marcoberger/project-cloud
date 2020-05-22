@@ -32,7 +32,7 @@ resource "aws_elastic_beanstalk_environment" "eb_environment" {
   name         = "${local.ressource_prefix}-backend-env"
   application  = aws_elastic_beanstalk_application.eb_app.name
   tier         = "WebServer"
-  platform_arn = "arn:aws:elasticbeanstalk:${var.region}::platform/Java 8 running on 64bit Amazon Linux/2.8.2"
+  platform_arn = "arn:aws:elasticbeanstalk:${var.region}::platform/Java 8 running on 64bit Amazon Linux/2.10.7"
 
   version_label = aws_elastic_beanstalk_application_version.eb_app_version.name
 
